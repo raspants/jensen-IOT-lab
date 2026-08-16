@@ -103,7 +103,7 @@ def get_measurements_for_device(device_id):
         WHERE device_id = %s
         ORDER BY created_at DESC;
     """
-    with get_connection() as con:
+    with get_connection() as conn:
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute(query, (device_id,))
             return [_json_ready(row) for row in cur.fetchall()]
