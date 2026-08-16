@@ -133,3 +133,14 @@ def insert_measurement(data):
                 )
             )
             return cur.fetchone()
+
+def total_amount_of_measurements():
+    query = """
+        SELECT COUNT(*) as total_measurements
+        FROM measurements;
+    """
+
+    with get_connection() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute(query)
+            return [_json_ready(row) for row in cur.fetchall()]    

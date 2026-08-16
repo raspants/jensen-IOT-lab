@@ -10,6 +10,14 @@ def test_valid_measurement():
     }
     assert validate_measurement(data) == []
 
+def test_missing_device_id():
+    data = {
+        "temperature": 21.5,
+        "humidity": 45.0,
+        "battery": 90,
+    }
+    assert "deviceId is required" in validate_measurement(data)
+
 
 def test_missing_temperature():
     data = {
@@ -19,13 +27,6 @@ def test_missing_temperature():
     }
     assert "temperature is required" in validate_measurement(data)
 
-def test_missing_device_id():
-    data = {
-        "temperature": 21.5,
-        "humidity": 45.0,
-        "battery": 90,
-    }
-    assert "deviceId is required" in validate_measurement(data)
 
 def test_invalid_temperature_type():
     data = {

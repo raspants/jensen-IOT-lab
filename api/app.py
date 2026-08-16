@@ -9,6 +9,7 @@ from db import (
     get_latest_measurement,
     get_measurements_for_device,
     insert_measurement,
+    total_amount_of_measurements,
 )
 from validation import validate_measurement
 from cache import get_latest_from_cache, set_latest_in_cache
@@ -106,6 +107,10 @@ def create_measurement():
     # även innan studenten implementerat persistensen.
     print(f"VALID measurement received: {data}")
     return jsonify({"status": "accepted", "measurement": data}), 202
+
+@app.get("/count-readings")
+def count_readings():
+    return jsonify(total_amount_of_measurements()), 200
 
 
 @app.get("/statistics")
