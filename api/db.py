@@ -144,3 +144,25 @@ def total_amount_of_measurements():
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute(query)
             return [_json_ready(row) for row in cur.fetchall()]    
+
+def get_average_temp():
+    query = """
+        SELECT ROUND(AVG(temperature), 2) AS average_temperature
+        FROM measurements;
+    """
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(query)
+            return cur.fetchone()[0]
+
+def get_measurements_last_24h():
+    query = """
+        SELECT * 
+        FROM measurements
+        WHERE created_at >= NOW() - INTERVAL '24 hours';
+    """
+
+    with get_connection() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute(query)
+            return [_json_ready(row) for row in cur.fetchall()]

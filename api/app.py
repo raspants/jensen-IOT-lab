@@ -10,6 +10,8 @@ from db import (
     get_measurements_for_device,
     insert_measurement,
     total_amount_of_measurements,
+    get_average_temp,
+    get_measurements_last_24h,
 )
 from validation import validate_measurement
 from cache import get_latest_from_cache, set_latest_in_cache
@@ -108,9 +110,20 @@ def create_measurement():
     print(f"VALID measurement received: {data}")
     return jsonify({"status": "accepted", "measurement": data}), 202
 
+
 @app.get("/count-readings")
 def count_readings():
     return jsonify(total_amount_of_measurements()), 200
+
+
+@app.get("/average-temp")
+def average_temp():
+    return jsonify(get_average_temp()), 200
+
+
+@app.get("/last-24")
+def last_24hours():
+    return jsonify(get_measurements_last_24h()), 200
 
 
 @app.get("/statistics")
