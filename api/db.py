@@ -53,16 +53,16 @@ def get_measurements():
 
 def device_exists(device_id):
     query = """
-    SELECT 1
-    from devices 
-    where device_id = %s
-    LIMIT 1 
+        SELECT 1
+        from devices 
+        where device_id = %s
+        LIMIT 1;
     """
 
     with get_connection() as conn:
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute(query, (device_id,))
-            return cur.fetchall is not None
+            return cur.fetchone() is not None
 
 
     # TODO M1:
