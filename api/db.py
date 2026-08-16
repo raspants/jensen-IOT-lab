@@ -50,7 +50,7 @@ def get_measurements():
             cur.execute(query)
             return [_json_ready(row) for row in cur.fetchall()]
 
-
+#Tested API /measurement endpoint with none existing device 
 def device_exists(device_id):
     query = """
         SELECT 1
@@ -64,10 +64,6 @@ def device_exists(device_id):
             cur.execute(query, (device_id,))
             return cur.fetchone() is not None
 
-
-    # TODO M1:
-    # Kontrollera om device_id finns i tabellen devices.
-    # Returnera True eller False.
     return False
 
 
@@ -85,25 +81,24 @@ def get_measurements_for_device(device_id):
 
 def insert_measurement(data):
     query = """
-    INSERT INTO measurements (
-        device_id,
-        temperature,
-        humidity,
-        battery
-        )
-    VALUES (%s, %s, %s, %s);
-    
+        INSERT INTO measurements (
+            device_id,
+            temperature,
+            humidity,
+            battery
+            )
+        VALUES (%s, %s, %s, %s)
+        RETURNING *;
+    """
+
     with get_connection() as conn:
-        with conn.cursor as cur:
+        with conn.cursor() as cur:
             cur.execute(query, 
                 (
-                data["deviceId"],
-                data["temperature"],
-                data["humidity"],
-                data["battery"])
+                    data["deviceId"],
+                    data["temperature"],
+                    data["humidity"],
+                    data["battery"]
+                )
             )
-
-    """
-    # TODO M1:
-    # Spara ett validerat mätvärde i PostgreSQL.
-    return None
+            return cur.fetchone()
