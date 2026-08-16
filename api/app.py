@@ -75,7 +75,6 @@ def device_history(device_id):
 def create_measurement():
     data = request.get_json(silent=True) or {}
     errors = validate_measurement(data)
-    known = device_exists(data.get("deviceId"))
 
     if errors:
         print(f"INVALID measurement from {data.get('deviceId', 'unknown')}: {errors}")
@@ -85,15 +84,13 @@ def create_measurement():
 
     if not known:
         print(f"INVALID deviceid from {data.get('deviceId')}")
-        return jsonify({"errors": errors}), 400
+        return jsonify({"error": "Unknown device"}), 400
 
     insert_measurement(data)
+
+    print(f"Valid measurements received: {data}")
+    return jsonify({"status": "created", "measurement": data}), 201 #change status when saving
         
-    # TODO M1:
-    # Kontrollera med device_exists(...) att deviceId tillhör en känd sensor.
-    # Okänd sensor ska ge 400 med ett tydligt JSON-fel.
-    #
-    # Spara till PostgreSQL via insert_measurement(data).
     #
     # TODO M2:
     # Uppdatera latest-cache för sensorn.
