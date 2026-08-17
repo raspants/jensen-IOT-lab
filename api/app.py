@@ -52,23 +52,20 @@ def latest(device_id):
     if not device_exists(device_id):
         return jsonify({"error": "unknown device"}), 404
 
+    measurement = get_latest_from_cache(device_id)
+
+    if measurement is not None:
+            return jsonify(measurement), 200
+
+
     measurement = get_latest_measurement(device_id)
 
-    if measurements is None:
+    if measurement is None:
         return jsonify({"error": "Measurement not found"}), 404
 
+    set_latest_in_cache(device_id, measurement)
+    
     return jsonify(measurement), 200
-
-
-    # TODO M2:
-    # Utöka M1-lösningen med cache-aside:
-    # 1. Försök läsa från Redis.
-    # 2. Vid cache miss: läs från PostgreSQL.
-    # 3. Spara databasresultatet i Redis.
-    return jsonify({
-        "message": "TODO: implementera latest measurement",
-        "deviceId": device_id
-    }), 501
 
 
 @app.get("/devices/<device_id>/measurements")
@@ -98,17 +95,10 @@ def create_measurement():
 
     insert_measurement(data)
 
+    set_latest_in_cache(data["deviceId"], data)
+
     print(f"Valid measurements received: {data}")
     return jsonify({"status": "created", "measurement": data}), 201 #change status when saving
-        
-    #
-    # TODO M2:
-    # Uppdatera latest-cache för sensorn.
-    #
-    # Under starter-fasen returneras 202 så att simulatorn kan köras
-    # även innan studenten implementerat persistensen.
-    print(f"VALID measurement received: {data}")
-    return jsonify({"status": "accepted", "measurement": data}), 202
 
 
 @app.get("/count-readings")
@@ -121,7 +111,7 @@ def average_temp():
     return jsonify(get_average_temp()), 200
 
 
-@app.get("/last-24")
+@app.get("/last-24h")
 def last_24hours():
     return jsonify(get_measurements_last_24h()), 200
 
