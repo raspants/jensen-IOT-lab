@@ -27,7 +27,6 @@ def test_missing_temperature():
     }
     assert "temperature is required" in validate_measurement(data)
 
-
 def test_invalid_temperature_type():
     data = {
         "deviceId": "sensor-003",
